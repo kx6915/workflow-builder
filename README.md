@@ -4,7 +4,7 @@
 
 ## 在线部署
 
-GitHub Pages 地址：<https://kx6915.github.io/wk-/>
+GitHub Pages 地址：<https://kx6915.github.io/workflow-builder/>
 
 如果 GitHub Pages 仍显示旧的 README 页面，请确认仓库 `Settings -> Pages -> Build and deployment -> Source` 已设置为 `GitHub Actions`，并等待最新 workflow 完成。
 
