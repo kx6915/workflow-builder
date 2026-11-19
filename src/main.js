@@ -2,12 +2,12 @@ const STORAGE_KEY = 'workflow-platform-state-v2';
 const nowText = () => new Date().toLocaleString('zh-CN', { hour12: false });
 
 const operatorCatalog = [
-  { type: 'start', label: '开始', icon: '▶', description: '定义工作流入口参数', logic: 'workflow.start' },
-  { type: 'condition', label: '条件判断', icon: '⌁', description: '按表达式选择执行路径', logic: 'logic.ifElse' },
-  { type: 'tool', label: '工具调用', icon: '⚒', description: '调用外部工具或模型能力', logic: 'tool.invoke' },
+  { type: 'start', label: '开始', icon: '▸', description: '定义工作流入口参数', logic: 'workflow.start' },
+  { type: 'condition', label: '条件判断', icon: '◆', description: '按表达式选择执行路径', logic: 'logic.ifElse' },
+  { type: 'tool', label: '工具调用', icon: '▣', description: '调用外部工具或模型能力', logic: 'tool.invoke' },
   { type: 'function', label: '函数处理', icon: 'ƒ', description: '运行内置或自定义函数', logic: 'function.execute' },
-  { type: 'data', label: '数据映射', icon: '◇', description: '转换、提取或合并上下文数据', logic: 'data.map' },
-  { type: 'publish', label: '发布', icon: '🚀', description: '将工作流发布为 API 或任务', logic: 'workflow.publish' },
+  { type: 'data', label: '数据映射', icon: '◈', description: '转换、提取或合并上下文数据', logic: 'data.map' },
+  { type: 'publish', label: '发布', icon: '↗', description: '将工作流发布为 API 或任务', logic: 'workflow.publish' },
 ];
 
 const functionLibrary = [
@@ -151,9 +151,9 @@ function renderNodes() {
   return state.nodes.map((node, index) => {
     const operator = getOperator(node.type);
     return `
-      <article class="flow-node ${node.enabled ? '' : 'disabled'}">
+      <article class="flow-node type-${node.type} ${node.enabled ? '' : 'disabled'}">
         <div class="node-index">${index + 1}</div>
-        <div class="node-icon">${operator.icon}</div>
+        <div class="node-icon type-${node.type}">${operator.icon}</div>
         <div class="node-body">
           <div class="node-meta"><span>${operator.label}</span><code>${operator.logic}</code><label><input type="checkbox" data-field="enabled" data-id="${node.id}" ${node.enabled ? 'checked' : ''} /> 启用</label></div>
           <input value="${escapeHtml(node.title)}" data-field="title" data-id="${node.id}" aria-label="${operator.label}标题" />
@@ -166,8 +166,8 @@ function renderNodes() {
 
 function renderValidation() {
   const validation = getValidation();
-  if (validation.ok) return '<div class="status good">✅ 校验通过，可以发布或运行</div>';
-  return `<div class="status bad">⚠️ ${validation.errors.map(escapeHtml).join('；')}</div>`;
+  if (validation.ok) return '<div class="status good">✓ 校验通过，可以发布或运行</div>';
+  return `<div class="status bad">请先处理：${validation.errors.map(escapeHtml).join('；')}</div>`;
 }
 
 function renderRegistry(items, mapper) {
@@ -179,17 +179,17 @@ function render() {
   root.innerHTML = `
     <main class="app-shell">
       <section class="hero">
-        <div><span class="eyebrow">Workflow Builder</span><h1>工作流搭建、工具调用与发布平台</h1><p>用简单中文操作符搭建流程，平台内部封装逻辑函数、工具适配器、草稿保存、发布校验和运行模拟，帮助业务人员与开发人员共同交付自动化应用。</p><div class="hero-actions"><button class="primary" id="save-draft">💾 保存草稿</button><button class="secondary" id="publish-workflow">🚀 发布工作流</button><button class="secondary" id="run-workflow">▶ 模拟运行</button></div></div>
-        <div class="publish-card"><div class="card-title">✅ 发布清单</div><ul><li>节点校验：${state.nodes.length} 个操作符 / ${state.nodes.filter((node) => node.enabled).length} 个已启用</li><li>草稿时间：${state.draftSavedAt || '尚未保存'}</li><li>发布地址：${state.endpoint || '发布后自动生成'}</li></ul>${renderValidation()}</div>
+        <div><span class="eyebrow">Workflow Builder</span><h1>工作流搭建、工具调用与发布平台</h1><p>用简单中文操作符搭建流程，平台内部封装逻辑函数、工具适配器、草稿保存、发布校验和运行模拟，帮助业务人员与开发人员共同交付自动化应用。</p><div class="hero-actions"><button class="secondary" id="save-draft">保存草稿</button><button class="primary" id="publish-workflow">发布工作流</button><button class="secondary" id="run-workflow">模拟运行</button></div></div>
+        <div class="publish-card"><div class="card-title">发布清单</div><ul><li>节点校验：${state.nodes.length} 个操作符 / ${state.nodes.filter((node) => node.enabled).length} 个已启用</li><li>草稿时间：${state.draftSavedAt || '尚未保存'}</li><li>发布地址：${state.endpoint || '发布后自动生成'}</li></ul>${renderValidation()}</div>
       </section>
       <section class="workspace">
-        <aside class="panel palette"><h2>中文操作符</h2><p>前台显示为业务可理解的中文名称，后台映射到稳定逻辑函数。</p><div class="operator-list">${renderOperators()}</div><button class="add-node" id="add-node">＋ 添加到流程</button><button class="ghost" id="export-workflow">导出发布 JSON</button></aside>
+        <aside class="panel palette"><h2>中文操作符</h2><p>前台显示为业务可理解的中文名称，后台映射到稳定逻辑函数。</p><div class="operator-list">${renderOperators()}</div><button class="add-node" id="add-node">+ 添加到流程</button><button class="ghost" id="export-workflow">导出发布 JSON</button></aside>
         <section class="panel canvas"><div class="section-header"><div><h2>流程画布</h2><p>按顺序编排节点，配置每一步的入参、工具和函数。</p></div><div class="field-row"><input id="workflow-name" value="${escapeHtml(state.workflowName)}" aria-label="工作流名称" /><input id="workflow-version" value="${escapeHtml(state.version)}" aria-label="版本号" /></div></div><div class="flow-list">${renderNodes()}</div></section>
       </section>
       <section class="registry-grid">
-        <div class="panel"><div class="section-header compact"><h2>工具调用注册表</h2><span>⚙</span></div>${renderRegistry(toolRegistry, (tool) => `<div class="registry-item"><strong>${tool.name}</strong><code>${tool.key}</code><p>${tool.description}</p><span>鉴权：${tool.auth} · ${tool.status}</span></div>`)}</div>
-        <div class="panel"><div class="section-header compact"><h2>函数库配置</h2><span>ƒ</span></div>${renderRegistry(functionLibrary, (fn) => `<div class="registry-item"><strong>${fn.name}</strong><code>${fn.signature}</code><p>${fn.description}</p><span>内部函数：${fn.key}</span></div>`)}</div>
-        <div class="panel payload-panel"><div class="section-header compact"><h2>发布配置预览</h2><span>🚀</span></div><label>发布方式<select id="publish-mode"><option ${state.publishMode === 'API 服务' ? 'selected' : ''}>API 服务</option><option ${state.publishMode === '定时任务' ? 'selected' : ''}>定时任务</option><option ${state.publishMode === 'Webhook 触发' ? 'selected' : ''}>Webhook 触发</option></select></label><pre>${escapeHtml(payload)}</pre></div>
+        <div class="panel"><div class="section-header compact"><h2>工具调用注册表</h2></div>${renderRegistry(toolRegistry, (tool) => `<div class="registry-item"><strong>${tool.name}</strong><code>${tool.key}</code><p>${tool.description}</p><div class="auth-row"><span>鉴权：${tool.auth}</span><span class="pill ${tool.status === '已配置' ? 'ok' : 'warn'}">${tool.status}</span></div></div>`)}</div>
+        <div class="panel"><div class="section-header compact"><h2>函数库配置</h2></div>${renderRegistry(functionLibrary, (fn) => `<div class="registry-item"><strong>${fn.name}</strong><code>${fn.signature}</code><p>${fn.description}</p><span>内部函数：${fn.key}</span></div>`)}</div>
+        <div class="panel payload-panel"><div class="section-header compact"><h2>发布配置预览</h2></div><label>发布方式<select id="publish-mode"><option ${state.publishMode === 'API 服务' ? 'selected' : ''}>API 服务</option><option ${state.publishMode === '定时任务' ? 'selected' : ''}>定时任务</option><option ${state.publishMode === 'Webhook 触发' ? 'selected' : ''}>Webhook 触发</option></select></label><pre>${escapeHtml(payload)}</pre></div>
       </section>
       <section class="panel log-panel"><div class="section-header compact"><h2>运行与发布日志</h2><button class="ghost" id="clear-log">清空日志</button></div><ol>${state.runLog.map((log) => `<li>${escapeHtml(log)}</li>`).join('')}</ol></section>
     </main>`;
